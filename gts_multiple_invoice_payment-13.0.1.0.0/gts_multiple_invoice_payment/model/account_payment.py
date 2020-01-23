@@ -10,7 +10,7 @@ class PaymentInvoiceLine(models.Model):
     payment_id = fields.Many2one('account.payment', 'Related Payment')
     partner_id = fields.Many2one(related='invoice_id.partner_id', string='Partner')
     amount_total = fields.Float('Amount Total')
-    residual = fields.Float('Amount Due')
+    amount_residual = fields.Float('Amount Due')
     amount = fields.Float('Amount To Pay',
         help="Enter amount to pay for this invoice, supports partial payment")
     invoice_date = fields.Date('Invoice Date')
@@ -22,7 +22,7 @@ class PaymentInvoiceLine(models.Model):
             if line.amount < 0:
                 raise UserError(_('Amount to pay can not be less than 0! (Invoice code: %s)')
                     % line.invoice_id.number)
-            if line.amount > line.residual:
+            if line.amount > line.amount_residual:
                 raise UserError(_('"Amount to pay" can not be greater than "Amount '
                                   'Due" ! (Invoice code: %s)')
                                 % line.invoice_id.number)
@@ -31,15 +31,15 @@ class PaymentInvoiceLine(models.Model):
     def onchange_invoice(self):
         if self.invoice_id:
             self.amount_total = self.invoice_id.amount_total
-            self.residual = self.invoice_id.residual
+            self.amount_residual = self.invoice_id.amount_residual
         else:
             self.amount_total = 0.0
-            self.residual = 0.0
+            self.amount_residual = 0.0
 
     @api.onchange('select')
     def onchange_select(self):
         if self.select:
-            self.amount = self.invoice_id.residual
+            self.amount = self.invoice_id.amount_residual
         else:
             self.amount = 0.0
 
@@ -96,16 +96,16 @@ class AccountPayment(models.Model):
             for invoice in invoices:
                 assigned_amount = 0
                 if total_amount > 0:
-                    if invoice.residual < total_amount:
-                        assigned_amount = invoice.residual
-                        total_amount -= invoice.residual
+                    if invoice.amount_residual < total_amount:
+                        assigned_amount = invoice.amount_residual
+                        total_amount -= invoice.amount_residual
                     else:
                         assigned_amount = total_amount
                         total_amount = 0
                 data = {
                     'invoice_id': invoice.id,
                     'amount_total': invoice.amount_total,
-                    'residual': invoice.residual,
+                    'amount_residual': invoice.amount_residual,
                     'amount': assigned_amount,
                     'invoice_date': invoice.invoice_date,
                 }
@@ -137,9 +137,9 @@ class AccountPayment(models.Model):
             total_amount = self.amount
             for line in self.invoice_lines:
                 if total_amount > 0:
-                    if line.residual < total_amount:
-                        line.amount = line.residual
-                        total_amount -= line.residual
+                    if line.amount_residual < total_amount:
+                        line.amount = line.amount_residual
+                        total_amount -= line.amount_residual
                     else:
                         line.amount = total_amount
                         total_amount = 0
