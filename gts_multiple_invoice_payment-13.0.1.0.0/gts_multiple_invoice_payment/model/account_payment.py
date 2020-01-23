@@ -6,7 +6,7 @@ from odoo.exceptions import UserError
 class PaymentInvoiceLine(models.Model):
     _name = 'payment.invoice.line'
 
-    invoice_id = fields.Many2one('account.invoice.send', 'Invoice')
+    invoice_id = fields.Many2one('account.invoice', 'Invoice')
     payment_id = fields.Many2one('account.payment', 'Related Payment')
     partner_id = fields.Many2one(related='invoice_id.partner_id', string='Partner')
     amount_total = fields.Float('Amount Total')
@@ -23,7 +23,7 @@ class PaymentInvoiceLine(models.Model):
                 raise UserError(_('Amount to pay can not be less than 0! (Invoice code: %s)')
                     % line.invoice_id.number)
             if line.amount > line.residual:
-                raise UserError(_('"Amount to pay" can not be greater than than "Amount '
+                raise UserError(_('"Amount to pay" can not be greater than "Amount '
                                   'Due" ! (Invoice code: %s)')
                                 % line.invoice_id.number)
 
