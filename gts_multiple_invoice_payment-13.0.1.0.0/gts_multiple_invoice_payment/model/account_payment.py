@@ -6,7 +6,7 @@ from odoo.exceptions import UserError
 class PaymentInvoiceLine(models.Model):
     _name = 'payment.invoice.line'
 
-    invoice_id = fields.Many2one('account.invoice', 'Invoice')
+    invoice_id = fields.Many2one('account.move', 'Invoice')
     payment_id = fields.Many2one('account.payment', 'Related Payment')
     partner_id = fields.Many2one(related='invoice_id.partner_id', string='Partner')
     amount_total = fields.Float('Amount Total')
