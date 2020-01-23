@@ -13,7 +13,7 @@ class PaymentInvoiceLine(models.Model):
     residual = fields.Float('Amount Due')
     amount = fields.Float('Amount To Pay',
         help="Enter amount to pay for this invoice, supports partial payment")
-    date_invoice = fields.Date('Invoice Date')
+    invoice_date = fields.Date('Invoice Date')
     select = fields.Boolean('Select', help="Click to select the invoice")
 
     @api.constrains('amount')
@@ -89,7 +89,7 @@ class AccountPayment(models.Model):
             elif self.payment_type == 'inbound':
                 type = 'out_invoice'
             invoices = Invoice.search([('partner_id', 'in', partners_list),
-                ('state', 'in', ('open', )), ('type', '=', type)], order="date_invoice")
+                ('state', 'in', ('open', )), ('type', '=', type)], order="invoice_date")
             total_amount = 0
             if self.amount > 0:
                 total_amount = self.amount
@@ -107,7 +107,7 @@ class AccountPayment(models.Model):
                     'amount_total': invoice.amount_total,
                     'residual': invoice.residual,
                     'amount': assigned_amount,
-                    'date_invoice': invoice.invoice_date,
+                    'invoice_date': invoice.invoice_date,
                 }
                 line = PaymentLine.create(data)
                 line_ids.append(line.id)
