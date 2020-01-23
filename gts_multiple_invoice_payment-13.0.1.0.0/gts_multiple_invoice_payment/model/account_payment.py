@@ -89,7 +89,7 @@ class AccountPayment(models.Model):
             elif self.payment_type == 'inbound':
                 type = 'out_invoice'
             invoices = Invoice.search([('partner_id', 'in', partners_list),
-                ('state', 'in', ('open', )), ('type', '=', type)], order="invoice_date")
+                ('state', 'in', ('posted', )), ('type', '=', type)], order="invoice_date")
             total_amount = 0
             if self.amount > 0:
                 total_amount = self.amount
