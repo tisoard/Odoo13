@@ -77,7 +77,7 @@ class AccountPayment(models.Model):
 
     @api.onchange('partner_id', 'payment_type')
     def onchange_partner_id(self):
-        Invoice = self.env['account.invoice']
+        Invoice = self.env['account.move']
         PaymentLine = self.env['payment.invoice.line']
         if self.partner_id:
             partners_list = self.partner_id.child_ids.ids
