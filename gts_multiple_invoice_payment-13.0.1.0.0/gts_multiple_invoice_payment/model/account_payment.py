@@ -107,7 +107,7 @@ class AccountPayment(models.Model):
                     'amount_total': invoice.amount_total,
                     'residual': invoice.residual,
                     'amount': assigned_amount,
-                    'date_invoice': invoice.date_invoice,
+                    'date_invoice': invoice.invoice_date,
                 }
                 line = PaymentLine.create(data)
                 line_ids.append(line.id)
